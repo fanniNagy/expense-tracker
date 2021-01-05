@@ -13,8 +13,12 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class EntryService {
 
+    private final EntryRepository entryRepository;
+
     @Autowired
-    EntryRepository entryRepository;
+    public EntryService(EntryRepository entryRepository) {
+        this.entryRepository = entryRepository;
+    }
 
     private LocalDate generateRandomDateBetween(LocalDate from, LocalDate to) {
         long minDay = from.toEpochDay();
@@ -28,10 +32,10 @@ public class EntryService {
     public Entry generateRandomEntry() {
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
-        Random randomPrice = new Random(100L);
+        Random randomPrice = new Random();
         return Entry.builder()
                 .date(generateRandomDateBetween(from, to))
-                .price(randomPrice.nextInt())
+                .price(randomPrice.nextInt(10000))
                 .build();
     }
 
