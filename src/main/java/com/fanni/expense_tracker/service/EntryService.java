@@ -57,4 +57,8 @@ public class EntryService {
         entryRepository.saveAndFlush(toAddEntry);
         return toAddEntry;
     }
+
+    public void clearRepository(){
+        entryRepository.deleteAll();
+    }
 }
