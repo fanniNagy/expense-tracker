@@ -4,8 +4,8 @@ import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -24,18 +24,18 @@ public class EntryService {
         long minDay = from.toEpochDay();
         long maxDay = to.toEpochDay();
         long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-        LocalDate randomDate = LocalDate.ofEpochDay(randomDay);
-        System.out.println(randomDate);
-        return randomDate;
+        return LocalDate.ofEpochDay(randomDay);
     }
 
     public Entry generateRandomEntry() {
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
+        LocalDate randomDate = generateRandomDateBetween(from, to);
         Random randomPrice = new Random();
         return Entry.builder()
-                .date(generateRandomDateBetween(from, to))
-                .price(randomPrice.nextInt(10000))
+                .date(randomDate)
+                .price(randomPrice.nextInt(10000)-5000)
+                .name(randomDate.format(DateTimeFormatter.ISO_DATE))
                 .build();
     }
 
