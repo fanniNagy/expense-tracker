@@ -49,4 +49,12 @@ public class EntryService {
         return entryRepository.findAll();
     }
 
+    public Entry addEntry(Entry entry) {
+        Entry toAddEntry = Entry.builder()
+                .price(entry.getPrice())
+                .name(entry.getName() != null ? entry.getName() : entry.getDate().format(DateTimeFormatter.ISO_DATE))
+                .build();
+        entryRepository.saveAndFlush(toAddEntry);
+        return toAddEntry;
+    }
 }
