@@ -4,6 +4,7 @@ import com.fanni.expense_tracker.model.Category;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.service.EntryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -36,7 +37,7 @@ public class EntryController {
     }
 
     @GetMapping("/between/dates/{fromDate}-{toDate}")
-    public Set<Entry> getAllEntriesBetweenDates(@PathVariable("fromDate") LocalDate from,@PathVariable("toDate")LocalDate to){
+    public Set<Entry> getAllEntriesBetweenDates(@PathVariable("fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,@PathVariable("toDate")@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to){
         return service.findEntriesByDateBetween(from, to);
     }
 
