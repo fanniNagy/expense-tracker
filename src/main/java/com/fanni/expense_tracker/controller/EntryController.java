@@ -17,35 +17,35 @@ public class EntryController {
     private final EntryService service;
 
     @Autowired
-    public EntryController(EntryService service){
+    public EntryController(EntryService service) {
         this.service = service;
     }
 
     @GetMapping
-    public List<Entry> getAllEntries(){
+    public List<Entry> getAllEntries() {
         return service.getAllEntries();
     }
 
     @GetMapping("/random")
-    public Entry createRandomEntry(){
+    public Entry createRandomEntry() {
         return service.createRandomEntry();
     }
 
     @PostMapping("/add")
-    public Entry addEntry(@RequestBody Entry entry){
+    public Entry addEntry(@RequestBody Entry entry) {
         return service.addEntry(entry);
     }
 
-    @GetMapping("/between/dates/{fromDate}-{toDate}")
-    public Set<Entry> getAllEntriesBetweenDates(@PathVariable("fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,@PathVariable("toDate")@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to){
+    @GetMapping("/between/dates/{fromDate}/{toDate}")
+    public Set<Entry> getAllEntriesBetweenDates(@PathVariable("fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+                                                @PathVariable("toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
         return service.findEntriesByDateBetween(from, to);
     }
 
     @PutMapping("/entry/{id}/addCategory/{category}")
-    public Entry addCategoryToEntry(@PathVariable("id") long id, @PathVariable("category")Category category){
+    public Entry addCategoryToEntry(@PathVariable("id") long id, @PathVariable("category") Category category) {
         return service.updateEntryCategory(id, category);
     }
-
 
 
 }
