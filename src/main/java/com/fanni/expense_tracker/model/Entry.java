@@ -1,10 +1,8 @@
 package com.fanni.expense_tracker.model;
 
 import lombok.*;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Data
@@ -24,5 +22,9 @@ public class Entry {
 
     @Builder.Default
     private LocalDate date = LocalDate.now();
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Category category = Category.UNCATEGORIZED;
 
 }
