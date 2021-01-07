@@ -1,15 +1,13 @@
 package com.fanni.expense_tracker.service;
 
+import com.fanni.expense_tracker.model.Category;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -80,4 +78,9 @@ public class EntryService {
         return entriesByPriceBetween;
     }
 
+    public Entry updateEntryCategory(long id, Category category){
+        Entry updatedEntry = entryRepository.findById(id).orElseThrow(() -> {throw new NoSuchElementException("No such entry found!");});
+        entryRepository.updateCategory(updatedEntry.getId(), category);
+        return entryRepository.findById(updatedEntry.getId()).orElseThrow(() -> {throw new NoSuchElementException("Categorizing went wrong, no such entry found");});
+    }
 }
