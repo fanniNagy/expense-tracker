@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -61,4 +63,21 @@ public class EntryService {
     public void clearRepository(){
         entryRepository.deleteAll();
     }
+
+    public Set<Entry> findEntriesByDateBetween(LocalDate from, LocalDate to){
+        Set<Entry> entriesByDateIsBetween =  entryRepository.findEntriesByDateIsBetween(from, to);
+        if (entriesByDateIsBetween == null){
+            entriesByDateIsBetween = new HashSet<>();
+        }
+        return entriesByDateIsBetween;
+    }
+
+    public Set<Entry> findEntriesByPriceBetween(int priceFrom, int priceTo){
+        Set<Entry> entriesByPriceBetween = entryRepository.findEntriesByPriceBetween(priceFrom, priceTo);
+        if(entriesByPriceBetween == null){
+            entriesByPriceBetween = new HashSet<>();
+        }
+        return entriesByPriceBetween;
+    }
+
 }

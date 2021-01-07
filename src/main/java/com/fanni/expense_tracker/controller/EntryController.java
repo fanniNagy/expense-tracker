@@ -3,11 +3,11 @@ package com.fanni.expense_tracker.controller;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.service.EntryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class EntryController {
@@ -32,5 +32,10 @@ public class EntryController {
     @PostMapping("/add")
     public Entry addEntry(@RequestBody Entry entry){
         return service.addEntry(entry);
+    }
+
+    @GetMapping("/between/dates/{fromDate}-{toDate}")
+    public Set<Entry> getAllEntriesBetweenDates(@PathVariable("fromDate") LocalDate from,@PathVariable("toDate")LocalDate to){
+        return service.findEntriesByDateBetween(from, to);
     }
 }
