@@ -31,18 +31,11 @@ class EntryControllerTest {
         this.mockMvc.perform(get("/random")).andExpect(status().isOk());
     }
 
-//    @Test
-//    void givenRandomRequested_WhenCallingEndpoint_ThenRandomEntryIsCreated() throws Exception {
-//        Mockito.when(mockEntryService.createRandomEntry()).thenReturn(testEntry);
-//        Mockito.when(controller.createRandomEntry()).thenCallRealMethod();
-//        this.mockMvc.perform(get("/random"))
-//                .andExpect(ResultMatcher.matchAll(
-//                        jsonPath("$.price").value("300"),
-//                        jsonPath("$.date").value("2021-01-30"),
-//                        jsonPath("$.name").value("2021-01-30")
-//                ));
-//        Entry body = this.restTemplate.getForEntity("/random", Entry.class).getBody();
-//
-//    }
+    @Test
+    void givenDBIsNotEmptyAndGetRequestOnDatesBetween_WhenGetRequestOnDatesBetween_ExpectOKStatus() throws Exception {
+        this.mockMvc.perform(get("/random"));
+        this.mockMvc.perform(get("/between/dates/2020-01-01/2021-01-01")).andExpect(status().isOk());
+    }
+
 
 }
