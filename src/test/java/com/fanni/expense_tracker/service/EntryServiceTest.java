@@ -1,5 +1,6 @@
 package com.fanni.expense_tracker.service;
 
+import com.fanni.expense_tracker.model.Category;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.repository.EntryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.springframework.test.annotation.Repeat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -91,6 +93,15 @@ public class EntryServiceTest {
         assertEquals(5, service.findEntriesByPriceBetween(-5000, 5000).size());
     }
 
+    @Test
+    void givenNoElementWithIdFound_WhenEntryIsQueried_ThenNoSuchElementExceptionThrown(){
+        assertThrows(NoSuchElementException.class, () -> service.updateEntryCategory(1L, Category.FOOD));
+    }
 
+    @Test
+    void givenElementIsFound_WhenEntryQueried_ThenCategoryIsUpdated(){
+        service.createRandomEntry();
+        assertEquals(Category.FOOD, service.updateEntryCategory(1L, Category.FOOD).getCategory());
+    }
 
 }
