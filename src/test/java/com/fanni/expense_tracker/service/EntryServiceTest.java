@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Repeat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -100,8 +99,8 @@ public class EntryServiceTest {
 
     @Test
     void givenElementIsFound_WhenEntryQueried_ThenCategoryIsUpdated(){
-        service.createRandomEntry();
-        assertEquals(Category.FOOD, service.updateEntryCategory(1L, Category.FOOD).getCategory());
+        Entry entry = service.createRandomEntry();
+        assertEquals(Category.FOOD, service.updateEntryCategory(entry.getId(), Category.FOOD).getCategory());
     }
 
 }
