@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+@CrossOrigin
 @RestController
 public class EntryController {
 
