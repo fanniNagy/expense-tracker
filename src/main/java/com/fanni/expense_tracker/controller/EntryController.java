@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @CrossOrigin
@@ -43,9 +44,14 @@ public class EntryController {
         return service.findEntriesByDateBetween(from, to);
     }
 
-    @PutMapping("/entry/{id}/addCategory/{category}")
+    @PutMapping("/addCategory/{id}/{category}")
     public Entry addCategoryToEntry(@PathVariable("id") long id, @PathVariable("category") Category category) {
         return service.updateEntryCategory(id, category);
+    }
+
+    @GetMapping("/category/all/count")
+    public Map<Category, Integer> getEntryCountByCategory(){
+        return service.countEntriesByCategory();
     }
 
 
