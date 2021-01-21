@@ -130,4 +130,22 @@ public class EntryService {
 
         return entriesPerCategory;
     }
+
+    public List<CategoryCount> getExpenseCountByCategory() {
+        Map<Category, Integer> expenseCountByCategory = new TreeMap<>();
+        List<CategoryCount> entriesPerCategory = new ArrayList<>();
+        List<Entry> allEntries = getAllEntries()
+                .stream()
+                .filter(entry -> !entry.getCategory().equals(Category.ONETIME_INCOME) && !entry.getCategory().equals(Category.PAYMENT))
+                .sorted(Comparator.comparing(Entry::getPrice)
+                        .reversed())
+                .collect(Collectors.toList());
+        for (Entry entry : allEntries) {
+            Category category = entry.getCategory();
+            expenseCountByCategory.merge(category, entry.getPrice(), Integer::sum);
+        }
+        expenseCountByCategory.forEach((category, integer) ->
+                entriesPerCategory.add(new CategoryCount(category, integer)));
+        return entriesPerCategory;
+    }
 }
