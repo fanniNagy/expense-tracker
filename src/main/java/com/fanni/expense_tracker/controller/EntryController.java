@@ -50,7 +50,7 @@ public class EntryController {
     }
 
     @GetMapping("/category/all/count")
-    public Map<Category, Integer> getEntryCountByCategory(){
+    public List<CategoryCount> getEntryCountByCategory(){
         return service.countEntriesByCategory();
     }
 
