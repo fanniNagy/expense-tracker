@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,19 +35,19 @@ public class EntryServiceTest {
     void givenDatesAreCorrect_WhenRandomDateGenerates_ThenReturnsCorrectDate() {
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
-        LocalDate generated = service.generateRandomEntry().getDate();
+        LocalDate generated = service.generateRandomExpense().getDate();
         assertTrue(generated.isAfter(from) && generated.isBefore(to));
     }
 
     @Test
     void givenEntryGenerated_WhenBuilt_ThenNameNotNull() {
-        Entry generatedEntry = service.generateRandomEntry();
+        Entry generatedEntry = service.generateRandomExpense();
         assertNotNull(generatedEntry.getName());
     }
 
     @Test
     void givenWhenRandomEntryCreated_ThenEntrySavedToRepository() {
-        Entry createdEntry = service.createRandomEntry();
+        Entry createdEntry = service.createRandomExpense();
         Optional<Entry> savedEntry = repository.findById(createdEntry.getId());
         assertEquals(createdEntry, savedEntry.orElseThrow(() -> new RuntimeException("Entry is not present")));
     }
@@ -59,7 +56,7 @@ public class EntryServiceTest {
     void givenEntriesAreSaved_WhenEntriesAreQueried_ThenAllGetsReturned() {
         List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            Entry entry = service.createRandomEntry();
+            Entry entry = service.createRandomExpense();
             entries.add(entry);
         }
         List<Entry> repositoryEntries = new ArrayList<>(service.getAllEntries());
@@ -75,7 +72,7 @@ public class EntryServiceTest {
 
     @Test
     void givenEntriesAreSaved_WhenEntriesAreQueriedByDatesBetween_ThenAllGetsReturned(){
-        IntStream.range(0, 5).forEach(i -> service.createRandomEntry());
+        IntStream.range(0, 5).forEach(i -> service.createRandomExpense());
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
         assertEquals(5, service.findEntriesByDateBetween(from, to).size());
@@ -88,7 +85,7 @@ public class EntryServiceTest {
 
     @Test
     void givenEntriesAreSaved_WhenEntriesAreQueriedByPriceBetween_ThenAllGetsReturned(){
-        IntStream.range(0, 5).forEach(i -> System.out.println(service.createRandomEntry()));
+        IntStream.range(0, 5).forEach(i -> System.out.println(service.createRandomExpense()));
         assertEquals(5, service.findEntriesByPriceBetween(-5000, 5000).size());
     }
 
@@ -99,7 +96,7 @@ public class EntryServiceTest {
 
     @Test
     void givenElementIsFound_WhenEntryQueried_ThenCategoryIsUpdated(){
-        Entry entry = service.createRandomEntry();
+        Entry entry = service.createRandomExpense();
         assertEquals(Category.FOOD, service.updateEntryCategory(entry.getId(), Category.FOOD).getCategory());
     }
 
