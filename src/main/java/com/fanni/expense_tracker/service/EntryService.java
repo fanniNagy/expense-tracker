@@ -29,20 +29,39 @@ public class EntryService {
         return LocalDate.ofEpochDay(randomDay);
     }
 
-    public Entry generateRandomEntry() {
+    public Category generateRandomCategoryToFitPrice(int price) {
+        Category[] incomeConstants = {Category.ONETIME_INCOME, Category.PAYMENT};
+        Category[] expenseConstants = Arrays.stream(Category.class.getEnumConstants())
+                .filter(category -> !Arrays.asList(incomeConstants).contains(category))
+                .toArray(Category[]::new);
+
+        Random random = new Random();
+        int randomIndex;
+        if (price >= 0) {
+            randomIndex = random.nextInt(incomeConstants.length);
+            return incomeConstants[randomIndex];
+        } else {
+            randomIndex = random.nextInt(expenseConstants.length);
+            return expenseConstants[randomIndex];
+        }
+    }
+
+    public Entry generateRandomExpense() {
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
         LocalDate randomDate = generateRandomDateBetween(from, to);
         Random randomPrice = new Random();
+        int generatedPrice = randomPrice.nextInt(499) - 500;
         return Entry.builder()
                 .date(randomDate)
-                .price(randomPrice.nextInt(10000) - 5000)
+                .price(generatedPrice)
                 .name(randomDate.format(DateTimeFormatter.ISO_DATE))
+                .category(generateRandomCategoryToFitPrice(generatedPrice))
                 .build();
     }
 
-    public Entry createRandomEntry() {
-        Entry randomEntry = generateRandomEntry();
+    public Entry createRandomExpense() {
+        Entry randomEntry = generateRandomExpense();
         entryRepository.saveAndFlush(randomEntry);
         return randomEntry;
     }
