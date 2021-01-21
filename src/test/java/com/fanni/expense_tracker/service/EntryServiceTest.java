@@ -100,4 +100,24 @@ public class EntryServiceTest {
         assertEquals(Category.FOOD, service.updateEntryCategory(entry.getId(), Category.FOOD).getCategory());
     }
 
+    @Test
+    void givenCategoriesWhenRandomCategoryGeneratedThenReturnsExistingCategory(){
+        Random random = new Random();
+        int randomPrice = random.nextInt(10000) - 5000;
+        Category category = service.generateRandomCategoryToFitPrice(randomPrice);
+        assertDoesNotThrow( () -> Arrays.stream(Category.class.getEnumConstants())
+                .filter(category::equals)
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException("No such Category found!")));
+    }
+
+    @Test
+    void givenCategoriesWhenRandomCategoryGeneratedWithPositiveValueThenReturnsIncomeCategory(){
+        Category category = service.generateRandomCategoryToFitPrice(300);
+        List<Category> incomeCategories= new ArrayList<>(Arrays.asList(Category.ONETIME_INCOME, Category.PAYMENT));
+        assertTrue(incomeCategories.contains(category));
+    }
+
+
+
 }
