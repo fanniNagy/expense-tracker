@@ -1,16 +1,17 @@
 package com.fanni.expense_tracker.service;
 
 import com.fanni.expense_tracker.model.Category;
+import com.fanni.expense_tracker.model.CategoryCount;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.repository.EntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 public class EntryService {
@@ -111,13 +112,22 @@ public class EntryService {
         });
     }
 
-    public Map<Category, Integer> countEntriesByCategory() {
+    public List<CategoryCount> countEntriesByCategory() {
         Map<Category, Integer> entryCountByCategory = new TreeMap<>();
-        List<Entry> allEntries = getAllEntries();
+        List<CategoryCount> entriesPerCategory = new ArrayList<>();
+        List<Entry> allEntries = getAllEntries()
+                .stream()
+                .sorted(Comparator.comparing(Entry::getPrice)
+                .reversed())
+                .collect(Collectors.toList());
+
         for (Entry entry : allEntries) {
             Category category = entry.getCategory();
-            entryCountByCategory.merge(category, 1, Integer::sum);
+            entryCountByCategory.merge(category, entry.getPrice(), Integer::sum);
         }
-        return entryCountByCategory;
+        entryCountByCategory.forEach((category, integer) ->
+                entriesPerCategory.add(new CategoryCount(category, integer)));
+
+        return entriesPerCategory;
     }
 }
