@@ -1,6 +1,7 @@
 package com.fanni.expense_tracker.controller;
 
 import com.fanni.expense_tracker.model.Category;
+import com.fanni.expense_tracker.model.CategoryCount;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.service.EntryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @CrossOrigin
@@ -30,7 +30,7 @@ public class EntryController {
 
     @GetMapping("/random")
     public Entry createRandomEntry() {
-        return service.createRandomEntry();
+        return service.createRandomExpense();
     }
 
     @PostMapping("/add")
