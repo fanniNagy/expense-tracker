@@ -54,5 +54,10 @@ public class EntryController {
         return service.countEntriesByCategory();
     }
 
+    @GetMapping("/category/expense/count")
+    public List<CategoryCount> getExpenseCountByCategory(){
+        return service.getExpenseCountByCategory();
+    }
+
 
 }
