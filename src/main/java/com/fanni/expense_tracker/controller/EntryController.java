@@ -59,5 +59,8 @@ public class EntryController {
         return service.getExpenseCountByCategory();
     }
 
-
+    @GetMapping("/category/top5spending")
+    public List<CategoryCount> getTop5SpendingCategories(){
+        return service.getTop5SpendingCategories();
+    }
 }

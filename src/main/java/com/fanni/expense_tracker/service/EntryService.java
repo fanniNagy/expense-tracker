@@ -118,7 +118,7 @@ public class EntryService {
         List<Entry> allEntries = getAllEntries()
                 .stream()
                 .sorted(Comparator.comparing(Entry::getPrice)
-                .reversed())
+                        .reversed())
                 .collect(Collectors.toList());
 
         for (Entry entry : allEntries) {
@@ -147,5 +147,12 @@ public class EntryService {
         expenseCountByCategory.forEach((category, integer) ->
                 entriesPerCategory.add(new CategoryCount(category, integer)));
         return entriesPerCategory;
+    }
+
+    public List<CategoryCount> getTop5SpendingCategories() {
+        return getExpenseCountByCategory().stream()
+                .sorted(Comparator.comparing(CategoryCount::getPrice))
+                .limit(5)
+                .collect(Collectors.toList());
     }
 }
