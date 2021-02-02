@@ -10,5 +10,5 @@ import lombok.Data;
 public class CategoryCount {
 
     private Category category;
-    private Integer price;
+    private Long price;
 }
