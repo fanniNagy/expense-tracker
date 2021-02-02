@@ -113,45 +113,16 @@ public class EntryService {
     }
 
     public List<CategoryCount> countEntriesByCategory() {
-        Map<Category, Integer> entryCountByCategory = new TreeMap<>();
-        List<CategoryCount> entriesPerCategory = new ArrayList<>();
-        List<Entry> allEntries = getAllEntries()
-                .stream()
-                .sorted(Comparator.comparing(Entry::getPrice)
-                        .reversed())
-                .collect(Collectors.toList());
-
-        for (Entry entry : allEntries) {
-            Category category = entry.getCategory();
-            entryCountByCategory.merge(category, entry.getPrice(), Integer::sum);
-        }
-        entryCountByCategory.forEach((category, integer) ->
-                entriesPerCategory.add(new CategoryCount(category, integer)));
-
-        return entriesPerCategory;
+        return entryRepository.getEntriesByCategories();
     }
 
     public List<CategoryCount> getExpenseCountByCategory() {
-        Map<Category, Integer> expenseCountByCategory = new TreeMap<>();
-        List<CategoryCount> entriesPerCategory = new ArrayList<>();
-        List<Entry> allEntries = getAllEntries()
-                .stream()
-                .filter(entry -> !entry.getCategory().equals(Category.ONETIME_INCOME) && !entry.getCategory().equals(Category.PAYMENT))
-                .sorted(Comparator.comparing(Entry::getPrice)
-                        .reversed())
-                .collect(Collectors.toList());
-        for (Entry entry : allEntries) {
-            Category category = entry.getCategory();
-            expenseCountByCategory.merge(category, entry.getPrice(), Integer::sum);
-        }
-        expenseCountByCategory.forEach((category, integer) ->
-                entriesPerCategory.add(new CategoryCount(category, integer)));
-        return entriesPerCategory;
+        return entryRepository.getSpendingByCategories();
     }
 
-    public List<CategoryCount> getTop5SpendingCategories() {
-        return getExpenseCountByCategory().stream()
-                .sorted(Comparator.comparing(CategoryCount::getPrice))
+    public List<CategoryCount> getTop5Spending() {
+        return entryRepository.getSpendingByCategories()
+                .stream()
                 .limit(5)
                 .collect(Collectors.toList());
     }
