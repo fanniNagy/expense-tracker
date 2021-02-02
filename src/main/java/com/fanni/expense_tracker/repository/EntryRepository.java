@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NamedNativeQuery;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -23,8 +24,11 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
     @Query("UPDATE Entry e SET e.category = ?2 where e.id = ?1")
     void updateCategory(long id, Category category);
 
-    @Query(value = "SELECT new com.fanni.expense_tracker.model.CategoryCount(e.category, SUM(e.price))"
-    + "FROM Entry AS e GROUP BY e.category")
+    @Query(value = "SELECT new com.fanni.expense_tracker.model.CategoryCount(e.category, SUM(e.price)) " +
+            "FROM Entry AS e " +
+            "GROUP BY e.category " +
+            "ORDER BY SUM(e.price) ASC")
     List<CategoryCount> getSpendingByCategories();
+
 
 }
