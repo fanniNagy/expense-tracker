@@ -1,6 +1,7 @@
 package com.fanni.expense_tracker.service;
 
 import com.fanni.expense_tracker.model.Category;
+import com.fanni.expense_tracker.model.CategoryCount;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.repository.EntryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,5 +127,23 @@ public class EntryServiceTest {
                         .price(-600)
                         .build());
         assertNotNull(repository.findById(testEntry.getId()));
+    }
+    @Test
+    void givenThereAreEntriesInDatabaseWhenQueriedByCategoryThenReturnsCorrectCategoryCount() {
+        service.addEntry(Entry.builder()
+                .price(-200)
+                .category(Category.FOOD)
+                .build());
+        service.addEntry(Entry.builder()
+                .price(-400)
+                .category(Category.FOOD)
+                .build());
+        List<CategoryCount> testList = new ArrayList<>();
+        testList.add(CategoryCount.builder()
+                .category(Category.FOOD)
+                .price(-600L)
+                .build());
+        assertEquals(testList,
+                service.countEntriesByCategory());
     }
 }
