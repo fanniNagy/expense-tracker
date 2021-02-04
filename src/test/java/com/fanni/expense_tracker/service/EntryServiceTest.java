@@ -27,7 +27,7 @@ public class EntryServiceTest {
     }
 
     @BeforeEach
-    void clearRepository(){
+    void clearRepository() {
         service.clearRepository();
     }
 
@@ -64,14 +64,14 @@ public class EntryServiceTest {
     }
 
     @Test
-    void givenThereAreNoMatchingEntries_WhenEntriesAreQueriedByDatesBetween_ThenNoNullGetsReturned(){
+    void givenThereAreNoMatchingEntries_WhenEntriesAreQueriedByDatesBetween_ThenNoNullGetsReturned() {
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
         assertNotNull(service.findEntriesByDateBetween(from, to));
     }
 
     @Test
-    void givenEntriesAreSaved_WhenEntriesAreQueriedByDatesBetween_ThenAllGetsReturned(){
+    void givenEntriesAreSaved_WhenEntriesAreQueriedByDatesBetween_ThenAllGetsReturned() {
         IntStream.range(0, 5).forEach(i -> service.createRandomExpense());
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
@@ -79,45 +79,52 @@ public class EntryServiceTest {
     }
 
     @Test
-    void givenThereAreNoMatchingEntries_WhenEntriesAreQueriedByPriceBetween_ThenNoNullGetsReturned(){
+    void givenThereAreNoMatchingEntries_WhenEntriesAreQueriedByPriceBetween_ThenNoNullGetsReturned() {
         assertNotNull(service.findEntriesByPriceBetween(-100000, 100000));
     }
 
     @Test
-    void givenEntriesAreSaved_WhenEntriesAreQueriedByPriceBetween_ThenAllGetsReturned(){
+    void givenEntriesAreSaved_WhenEntriesAreQueriedByPriceBetween_ThenAllGetsReturned() {
         IntStream.range(0, 5).forEach(i -> System.out.println(service.createRandomExpense()));
         assertEquals(5, service.findEntriesByPriceBetween(-5000, 5000).size());
     }
 
     @Test
-    void givenNoElementWithIdFound_WhenEntryIsQueried_ThenNoSuchElementExceptionThrown(){
+    void givenNoElementWithIdFound_WhenEntryIsQueried_ThenNoSuchElementExceptionThrown() {
         assertThrows(NoSuchElementException.class, () -> service.updateEntryCategory(1L, Category.FOOD));
     }
 
     @Test
-    void givenElementIsFound_WhenEntryQueried_ThenCategoryIsUpdated(){
+    void givenElementIsFound_WhenEntryQueried_ThenCategoryIsUpdated() {
         Entry entry = service.createRandomExpense();
         assertEquals(Category.FOOD, service.updateEntryCategory(entry.getId(), Category.FOOD).getCategory());
     }
 
     @Test
-    void givenCategoriesWhenRandomCategoryGeneratedThenReturnsExistingCategory(){
+    void givenCategoriesWhenRandomCategoryGeneratedThenReturnsExistingCategory() {
         Random random = new Random();
         int randomPrice = random.nextInt(10000) - 5000;
         Category category = service.generateRandomCategoryToFitPrice(randomPrice);
-        assertDoesNotThrow( () -> Arrays.stream(Category.class.getEnumConstants())
+        assertDoesNotThrow(() -> Arrays.stream(Category.class.getEnumConstants())
                 .filter(category::equals)
                 .findFirst()
                 .orElseThrow(() -> new NoSuchElementException("No such Category found!")));
     }
 
     @Test
-    void givenCategoriesWhenRandomCategoryGeneratedWithPositiveValueThenReturnsIncomeCategory(){
+    void givenCategoriesWhenRandomCategoryGeneratedWithPositiveValueThenReturnsIncomeCategory() {
         Category category = service.generateRandomCategoryToFitPrice(300);
-        List<Category> incomeCategories= new ArrayList<>(Arrays.asList(Category.ONETIME_INCOME, Category.PAYMENT));
+        List<Category> incomeCategories = new ArrayList<>(Arrays.asList(Category.ONETIME_INCOME, Category.PAYMENT));
         assertTrue(incomeCategories.contains(category));
     }
 
-
-
+    @Test
+    void givenEntryHasPriceWhenEntryAddedThenEntrySavedInRepository() {
+        Entry testEntry = service
+                .addEntry(Entry
+                        .builder()
+                        .price(-600)
+                        .build());
+        assertNotNull(repository.findById(testEntry.getId()));
+    }
 }
