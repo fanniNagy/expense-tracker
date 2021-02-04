@@ -146,4 +146,24 @@ public class EntryServiceTest {
         assertEquals(testList,
                 service.countEntriesByCategory());
     }
+
+    @Test
+    void givenThereAreEntriesInDBWhenExpensesAreQueriedThenOnlyExpensesReturned() {
+        service.addEntry(Entry.builder()
+                .price(-200)
+                .category(Category.FOOD)
+                .build());
+        service.addEntry(Entry.builder()
+                .price(400)
+                .category(Category.ONETIME_INCOME)
+                .build());
+        List<CategoryCount> testList = new ArrayList<>();
+        testList.add(CategoryCount.builder()
+                .category(Category.FOOD)
+                .price(-200L)
+                .build());
+        assertEquals(testList,
+                service.getExpenseCountByCategory());
+    }
+
 }
