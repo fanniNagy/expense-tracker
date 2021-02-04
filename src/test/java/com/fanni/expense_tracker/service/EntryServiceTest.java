@@ -166,4 +166,22 @@ public class EntryServiceTest {
                 service.getExpenseCountByCategory());
     }
 
+    @Test
+    void givenThereAreEntriesInDBWhenTop5AreQueriedThenCategoriesWithBiggestSpendingReturned() {
+        service.addEntry(Entry.builder().price(1000).category(Category.PAYMENT).build());
+        service.addEntry(Entry.builder().price(-7000).category(Category.PETS).build());
+        service.addEntry(Entry.builder().price(-2000).category(Category.FOOD).build());
+        service.addEntry(Entry.builder().price(-700).category(Category.TRANSPORTATION).build());
+        service.addEntry(Entry.builder().price(-600).category(Category.HOUSEHOLD).build());
+        service.addEntry(Entry.builder().price(-200).category(Category.MISCELLANEOUS).build());
+
+        List<CategoryCount> testList = new ArrayList<>(Arrays.asList(
+                new CategoryCount(Category.PETS, -7000L),
+                new CategoryCount(Category.FOOD, -2000L),
+                new CategoryCount(Category.TRANSPORTATION, -700L),
+                new CategoryCount(Category.HOUSEHOLD, -600L),
+                new CategoryCount(Category.MISCELLANEOUS, -200L)));
+
+        assertEquals(testList, service.getTop5Spending());
+    }
 }
