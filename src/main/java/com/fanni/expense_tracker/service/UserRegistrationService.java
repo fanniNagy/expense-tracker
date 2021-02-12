@@ -6,29 +6,33 @@ import com.fanni.expense_tracker.security.PasswordConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
+
 @Service
 public class UserRegistrationService {
 
     private final AppUserRepository userRepository;
     private final PasswordConfig passwordConfig;
+    private final RegistrationFilter registrationFilter;
 
     @Autowired
-    public UserRegistrationService(AppUserRepository userRepository, PasswordConfig passwordConfig) {
+    public UserRegistrationService(AppUserRepository userRepository, PasswordConfig passwordConfig, UserExistsFilter registrationFilter) {
         this.userRepository = userRepository;
         this.passwordConfig = passwordConfig;
+        this.registrationFilter = registrationFilter;
+        registerFilters();
     }
 
-    public boolean isUserNameAvailable(String userName) {
-        return userRepository.findAppUserByUserName(userName).isEmpty();
+    public void registerFilters() {
+        registrationFilter.linkWith(new RoleCheckFilter())
+                .linkWith(new RegistrationSuccessFilter(userRepository, passwordConfig));
     }
 
-    public void registerUser(String userName, String password) {
-        userRepository.saveAndFlush(
-                AppUser.builder()
-                        .userName(userName)
-                        .password(passwordConfig.passwordEncoder().encode(password))
-                        .build()
-        );
+    public AppUser registerUser(String userName, String password) {
+        registrationFilter.check(userName, password);
+        return userRepository.findAppUserByUserName(userName)
+                .orElseThrow(() -> new NoSuchElementException("Registration unsuccessful"));
     }
+
 
 }
