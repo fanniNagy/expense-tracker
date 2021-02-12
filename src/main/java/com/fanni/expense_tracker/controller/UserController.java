@@ -19,4 +19,9 @@ public class UserController {
         this.registrationService = registrationService;
     }
 
+    @PostMapping("/register")
+    public AppUser registerNewUser(@RequestBody AppUser user){
+        return registrationService.registerUser(user.getUserName(), user.getPassword());
+    }
+
 }
