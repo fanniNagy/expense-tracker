@@ -4,18 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @Entity
 @Builder
 @NoArgsConstructor
-public class AppUser {
+public class AppUser{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,5 +24,7 @@ public class AppUser {
 
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<SimpleGrantedAuthority> authorities;
 
 }
