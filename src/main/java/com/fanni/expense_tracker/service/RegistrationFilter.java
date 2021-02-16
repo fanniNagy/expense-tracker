@@ -5,7 +5,10 @@ import com.fanni.expense_tracker.repository.AppUserRepository;
 import com.fanni.expense_tracker.security.PasswordConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import java.util.HashSet;
 
 public abstract class RegistrationFilter {
 
@@ -89,6 +92,9 @@ class RegistrationSuccessFilter extends RegistrationFilter {
                 AppUser.builder()
                         .userName(userName)
                         .password(passwordConfig.passwordEncoder().encode(password))
+                        .authorities(new HashSet<>(){
+                            {add(new SimpleGrantedAuthority("USER"));}
+                        })
                         .build()
         );
         return checkNext(userName, password);
