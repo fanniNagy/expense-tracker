@@ -1,5 +1,7 @@
 package com.fanni.expense_tracker.security;
 
+import com.fanni.expense_tracker.security.jwt.JwtConfig;
+import com.fanni.expense_tracker.security.jwt.JwtTokenVerifier;
 import com.fanni.expense_tracker.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import com.fanni.expense_tracker.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +16,26 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.crypto.SecretKey;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final CustomUserDetailsService userDetailsService;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     @Autowired
-    public SecurityConfig(PasswordEncoder passwordEncoder, CustomUserDetailsService userDetailsService) {
+    public SecurityConfig(PasswordEncoder passwordEncoder,
+                          CustomUserDetailsService userDetailsService,
+                          SecretKey secretKey,
+                          JwtConfig jwtConfig) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
     }
 
     @Override
@@ -35,12 +46,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+                .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig),JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/user/register").permitAll()
                 .antMatchers("/login").permitAll()
                 .anyRequest().authenticated();
-
     }
 
     @Override
