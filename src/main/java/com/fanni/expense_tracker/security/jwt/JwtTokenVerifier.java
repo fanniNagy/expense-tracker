@@ -1,13 +1,14 @@
 package com.fanni.expense_tracker.security.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,21 +21,33 @@ import java.util.stream.Collectors;
 
 public class JwtTokenVerifier extends OncePerRequestFilter{
 
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
+
+    @Autowired
+    public JwtTokenVerifier(SecretKey secretKey, JwtConfig jwtConfig) {
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
                                     HttpServletResponse httpServletResponse,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String authorizationHeader = httpServletRequest.getHeader("Authorization");
-        if(authorizationHeader == null || authorizationHeader.length()==0 || !authorizationHeader.startsWith("Bearer ")){
+        String authorizationHeader = httpServletRequest.getHeader(jwtConfig.getAuthorizationHeader());
+        if(authorizationHeader == null
+                || authorizationHeader.length()==0
+                || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())){
             filterChain.doFilter(httpServletRequest, httpServletResponse);
         } else{
-            String token = authorizationHeader.replace("Bearer ", "");
+
+            String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
+
             try{
-                String key = "VeeerySecureKeyWhichShallBeMoreThan256BitsAsByteArraySoIDontGetWeakKeyException";
 
                 JwtParser jwtParser = Jwts.parserBuilder()
-                        .setSigningKey(Keys.hmacShaKeyFor(key.getBytes()))
+                        .setSigningKey(secretKey)
                         .build();
 
                 Jws<Claims> claimsJws = jwtParser.parseClaimsJws(token);
@@ -42,7 +55,9 @@ public class JwtTokenVerifier extends OncePerRequestFilter{
                 String username = body.getSubject();
                 var authorities = (List<Map<String, String>>) body.get("authorities");
 
-                Set<SimpleGrantedAuthority> simpleGrantedAuthoritites = authorities.stream().map(stringStringMap -> new SimpleGrantedAuthority(stringStringMap.get("authority")))
+                Set<SimpleGrantedAuthority> simpleGrantedAuthoritites =
+                        authorities.stream()
+                                .map(stringStringMap -> new SimpleGrantedAuthority(stringStringMap.get("authority")))
                         .collect(Collectors.toSet());
 
                 Authentication authentication = new UsernamePasswordAuthenticationToken(
