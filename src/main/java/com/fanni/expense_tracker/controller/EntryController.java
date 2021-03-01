@@ -51,7 +51,7 @@ public class EntryController {
 
     @GetMapping("/category/all/count")
     public List<CategoryCount> getEntryCountByCategory(){
-        return service.countEntriesByCategory();
+        return service.countEntriesOfUserByCategory();
     }
 
     @GetMapping("/category/expense/count")
