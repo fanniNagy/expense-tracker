@@ -84,6 +84,7 @@ public class EntryService {
     public Entry addEntry(Entry entry) {
         Entry toAddEntry = Entry.builder()
                 .price(entry.getPrice())
+                .user(userService.getCurrentUser())
                 .name(entry.getName() != null ? entry.getName() : entry.getDate().format(DateTimeFormatter.ISO_DATE))
                 .date(entry.getDate())
                 .category(entry.getCategory())
