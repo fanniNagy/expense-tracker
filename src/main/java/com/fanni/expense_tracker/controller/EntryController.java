@@ -56,7 +56,7 @@ public class EntryController {
 
     @GetMapping("/category/expense/count")
     public List<CategoryCount> getExpenseCountByCategory(){
-        return service.getExpenseCountByCategory();
+        return service.getExpenseCountOfUserByCategory();
     }
 
     @GetMapping("/category/top5spending")
