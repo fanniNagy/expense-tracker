@@ -14,6 +14,8 @@ import java.util.Set;
 
 public interface EntryRepository extends JpaRepository<Entry, Long> {
 
+    Set<Entry> findAllEntryByUserId(Long userId);
+
     Set<Entry> findEntriesByDateIsBetween(LocalDate from, LocalDate to);
 
     @Query(nativeQuery = true,
