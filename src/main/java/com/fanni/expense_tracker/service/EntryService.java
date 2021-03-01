@@ -63,8 +63,15 @@ public class EntryService {
                 .build();
     }
 
+    public Entry generateRandomExpenseForUser(AppUser user){
+        Entry entry = generateRandomExpense();
+        entry.setUser(user);
+        return entry;
+    }
+
     public Entry createRandomExpense() {
-        Entry randomEntry = generateRandomExpense();
+        AppUser user = userService.getCurrentUser();
+        Entry randomEntry = generateRandomExpenseForUser(user);
         entryRepository.saveAndFlush(randomEntry);
         return randomEntry;
     }
