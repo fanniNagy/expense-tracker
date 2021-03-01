@@ -76,8 +76,9 @@ public class EntryService {
         return randomEntry;
     }
 
-    public List<Entry> getAllEntries() {
-        return entryRepository.findAll();
+    public Set<Entry> getAllEntries() {
+        AppUser currentUser = userService.getCurrentUser();
+        return entryRepository.findAllEntryByUserId(currentUser.getId());
     }
 
     public Entry addEntry(Entry entry) {
