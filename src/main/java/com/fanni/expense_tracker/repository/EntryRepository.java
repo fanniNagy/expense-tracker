@@ -16,7 +16,12 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
 
     Set<Entry> findEntriesByDateIsBetween(LocalDate from, LocalDate to);
 
-    Set<Entry> findEntriesByPriceBetween(int from, int to);
+    @Query(nativeQuery = true,
+            value = "SELECT * " +
+                    "FROM Entry AS e " +
+                    "WHERE (e.price BETWEEN :from AND :to) AND (e.user_id = :userId)" +
+                    "GROUP BY e.user_id, e.id")
+    Set<Entry> findEntriesOfUserByPriceBetween(@Param("userId")Long userId, @Param("from")int from, @Param("to")int to);
 
     @Transactional
     @Modifying
