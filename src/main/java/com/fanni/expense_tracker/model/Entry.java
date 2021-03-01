@@ -27,4 +27,7 @@ public class Entry {
     @Builder.Default
     private Category category = Category.UNCATEGORIZED;
 
+    @ManyToOne
+    private AppUser user;
+
 }
