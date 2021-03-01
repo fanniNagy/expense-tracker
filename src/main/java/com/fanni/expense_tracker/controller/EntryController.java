@@ -43,6 +43,11 @@ public class EntryController {
                                                 @PathVariable("toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to) {
         return service.findEntriesByDateBetween(from, to);
     }
+    @GetMapping("/between/price/{fromPrice}/{toPrice}")
+    public Set<Entry> getAllEntriesBetweenPrice(@PathVariable("fromPrice") int priceFrom,
+                                                @PathVariable("toPrice") int priceTo) {
+        return service.findEntriesOfUserByPriceBetween(priceFrom, priceTo);
+    }
 
     @PutMapping("/addCategory/{id}/{category}")
     public Entry addCategoryToEntry(@PathVariable("id") long id, @PathVariable("category") Category category) {
