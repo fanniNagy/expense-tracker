@@ -46,7 +46,7 @@ public class EntryController {
 
     @PutMapping("/addCategory/{id}/{category}")
     public Entry addCategoryToEntry(@PathVariable("id") long id, @PathVariable("category") Category category) {
-        return service.updateEntryCategory(id, category);
+        return service.updateEntryCategoryOfUser(id, category);
     }
 
     @GetMapping("/category/all/count")
