@@ -105,8 +105,9 @@ public class EntryService {
         return entriesByDateIsBetween;
     }
 
-    public Set<Entry> findEntriesByPriceBetween(int priceFrom, int priceTo) {
-        Set<Entry> entriesByPriceBetween = entryRepository.findEntriesByPriceBetween(priceFrom, priceTo);
+    public Set<Entry> findEntriesOfUserByPriceBetween(int priceFrom, int priceTo) {
+        AppUser user = userService.getCurrentUser();
+        Set<Entry> entriesByPriceBetween = entryRepository.findEntriesOfUserByPriceBetween(user.getId(), priceFrom, priceTo);
         if (entriesByPriceBetween == null) {
             entriesByPriceBetween = new HashSet<>();
         }
