@@ -24,7 +24,7 @@ public class EntryController {
     }
 
     @GetMapping
-    public List<Entry> getAllEntries() {
+    public Set<Entry> getAllEntries() {
         return service.getAllEntries();
     }
 
