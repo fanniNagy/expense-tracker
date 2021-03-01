@@ -17,10 +17,12 @@ import java.util.stream.Collectors;
 public class EntryService {
 
     private final EntryRepository entryRepository;
+    private final AppUserService userService;
 
     @Autowired
-    public EntryService(EntryRepository entryRepository) {
+    public EntryService(EntryRepository entryRepository, AppUserService userService) {
         this.entryRepository = entryRepository;
+        this.userService = userService;
     }
 
     private LocalDate generateRandomDateBetween(LocalDate from, LocalDate to) {
