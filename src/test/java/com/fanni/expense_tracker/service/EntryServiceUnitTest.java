@@ -67,4 +67,10 @@ public class EntryServiceUnitTest {
         Assertions.assertEquals(this.user, randomExpense.getUser());
     }
 
+    @Test
+    void givenRepositoryAvailable_WhenAllEntriesOfUserQueried_ThenRepositoryReturnsNotNull(){
+        assertNotNull(this.service.getAllEntries(this.user));
+        Mockito.verify(this.repository, Mockito.times(1)).findAllEntryByUserId(this.user.getId());
+    }
+
 }
