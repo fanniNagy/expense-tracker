@@ -113,4 +113,15 @@ public class EntryServiceUnitTest {
         assertEquals(HashSet.class, this.service.findEntriesOfUserByDateBetween(testDate, testDate, this.user).getClass());
         assertTrue(this.service.findEntriesOfUserByDateBetween(testDate, testDate, this.user).isEmpty());
     }
+
+    @Test
+    void givenThereAreNoMatchingEntriesInRepository_WhenEntriesAreQueriedByPriceBetween_ThenNotNullReturned() {
+        int testPriceFrom = -2000;
+        int testPriceTo = -200;
+        assertNotNull(this.service.findEntriesOfUserByPriceBetween(testPriceFrom, testPriceTo, this.user));
+        Mockito.verify(this.repository,
+                Mockito.times(1))
+                .findEntriesOfUserByPriceBetween(user.getId(), testPriceFrom, testPriceTo);
+    }
+
 }
