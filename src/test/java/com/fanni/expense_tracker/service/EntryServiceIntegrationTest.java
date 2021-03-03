@@ -1,13 +1,17 @@
 package com.fanni.expense_tracker.service;
 
+import com.fanni.expense_tracker.model.AppUser;
 import com.fanni.expense_tracker.model.Category;
 import com.fanni.expense_tracker.model.CategoryCount;
 import com.fanni.expense_tracker.model.Entry;
+import com.fanni.expense_tracker.repository.AppUserRepository;
 import com.fanni.expense_tracker.repository.EntryRepository;
+import com.fanni.expense_tracker.security.PasswordConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -16,39 +20,39 @@ import java.util.stream.IntStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class EntryServiceTest {
+public class EntryServiceIntegrationTest {
 
     private final EntryService service;
     private final EntryRepository repository;
+    private AppUser testUser;
+    private final AppUserRepository userRepository;
+
 
     @Autowired
-    public EntryServiceTest(EntryService service, EntryRepository repository) {
+    public EntryServiceIntegrationTest(EntryService service, EntryRepository repository, AppUserRepository userRepository) {
         this.service = service;
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
     @BeforeEach
     void clearRepository() {
         service.clearRepository();
-    }
-
-    @Test
-    void givenDatesAreCorrect_WhenRandomDateGenerates_ThenReturnsCorrectDate() {
-        LocalDate from = LocalDate.of(2020, 1, 1);
-        LocalDate to = LocalDate.of(2021, 1, 1);
-        LocalDate generated = service.generateRandomExpense().getDate();
-        assertTrue(generated.isAfter(from) && generated.isBefore(to));
-    }
-
-    @Test
-    void givenEntryGenerated_WhenBuilt_ThenNameNotNull() {
-        Entry generatedEntry = service.generateRandomExpense();
-        assertNotNull(generatedEntry.getName());
+        this.testUser = AppUser.builder()
+                .userName("test")
+                .password(new PasswordConfig().passwordEncoder().encode("test"))
+                .authorities(new HashSet<>() {
+                    {
+                        add(new SimpleGrantedAuthority("USER"));
+                    }
+                })
+                .build();
+        userRepository.saveAndFlush(testUser);
     }
 
     @Test
     void givenWhenRandomEntryCreated_ThenEntrySavedToRepository() {
-        Entry createdEntry = service.createRandomExpense();
+        Entry createdEntry = service.createRandomExpense(testUser);
         Optional<Entry> savedEntry = repository.findById(createdEntry.getId());
         assertEquals(createdEntry, savedEntry.orElseThrow(() -> new RuntimeException("Entry is not present")));
     }
@@ -57,10 +61,10 @@ public class EntryServiceTest {
     void givenEntriesAreSaved_WhenEntriesAreQueried_ThenAllGetsReturned() {
         List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            Entry entry = service.createRandomExpense();
+            Entry entry = service.createRandomExpense(testUser);
             entries.add(entry);
         }
-        List<Entry> repositoryEntries = new ArrayList<>(service.getAllEntries());
+        List<Entry> repositoryEntries = new ArrayList<>(service.getAllEntries(testUser));
         assertIterableEquals(entries, repositoryEntries);
     }
 
@@ -68,37 +72,37 @@ public class EntryServiceTest {
     void givenThereAreNoMatchingEntries_WhenEntriesAreQueriedByDatesBetween_ThenNoNullGetsReturned() {
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
-        assertNotNull(service.findEntriesByDateBetween(from, to));
+        assertNotNull(service.findEntriesOfUserByDateBetween(from, to, testUser));
     }
 
     @Test
     void givenEntriesAreSaved_WhenEntriesAreQueriedByDatesBetween_ThenAllGetsReturned() {
-        IntStream.range(0, 5).forEach(i -> service.createRandomExpense());
+        IntStream.range(0, 5).forEach(i -> service.createRandomExpense(testUser));
         LocalDate from = LocalDate.of(2020, 1, 1);
         LocalDate to = LocalDate.of(2021, 1, 1);
-        assertEquals(5, service.findEntriesByDateBetween(from, to).size());
+        assertEquals(5, service.findEntriesOfUserByDateBetween(from, to, testUser).size());
     }
 
     @Test
     void givenThereAreNoMatchingEntries_WhenEntriesAreQueriedByPriceBetween_ThenNoNullGetsReturned() {
-        assertNotNull(service.findEntriesByPriceBetween(-100000, 100000));
+        assertNotNull(service.findEntriesOfUserByPriceBetween(-100000, 100000, testUser));
     }
 
     @Test
     void givenEntriesAreSaved_WhenEntriesAreQueriedByPriceBetween_ThenAllGetsReturned() {
-        IntStream.range(0, 5).forEach(i -> System.out.println(service.createRandomExpense()));
-        assertEquals(5, service.findEntriesByPriceBetween(-5000, 5000).size());
+        IntStream.range(0, 5).forEach(i -> System.out.println(service.createRandomExpense(testUser)));
+        assertEquals(5, service.findEntriesOfUserByPriceBetween(-5000, 5000, testUser).size());
     }
 
     @Test
     void givenNoElementWithIdFound_WhenEntryIsQueried_ThenNoSuchElementExceptionThrown() {
-        assertThrows(NoSuchElementException.class, () -> service.updateEntryCategory(1L, Category.FOOD));
+        assertThrows(NoSuchElementException.class, () -> service.updateEntryCategoryOfUser(1L, Category.FOOD, testUser));
     }
 
     @Test
     void givenElementIsFound_WhenEntryQueried_ThenCategoryIsUpdated() {
-        Entry entry = service.createRandomExpense();
-        assertEquals(Category.FOOD, service.updateEntryCategory(entry.getId(), Category.FOOD).getCategory());
+        Entry entry = service.createRandomExpense(testUser);
+        assertEquals(Category.FOOD, service.updateEntryCategoryOfUser(entry.getId(), Category.FOOD, testUser).getCategory());
     }
 
     @Test
@@ -125,26 +129,27 @@ public class EntryServiceTest {
                 .addEntry(Entry
                         .builder()
                         .price(-600)
-                        .build());
+                        .build(), testUser);
         assertNotNull(repository.findById(testEntry.getId()));
     }
+
     @Test
     void givenThereAreEntriesInDatabaseWhenQueriedByCategoryThenReturnsCorrectCategoryCount() {
         service.addEntry(Entry.builder()
                 .price(-200)
                 .category(Category.FOOD)
-                .build());
+                .build(), testUser);
         service.addEntry(Entry.builder()
                 .price(-400)
                 .category(Category.FOOD)
-                .build());
+                .build(), testUser);
         List<CategoryCount> testList = new ArrayList<>();
         testList.add(CategoryCount.builder()
                 .category(Category.FOOD)
                 .price(-600L)
                 .build());
         assertEquals(testList,
-                service.countEntriesByCategory());
+                service.countEntriesOfUserByCategory(testUser));
     }
 
     @Test
@@ -152,28 +157,28 @@ public class EntryServiceTest {
         service.addEntry(Entry.builder()
                 .price(-200)
                 .category(Category.FOOD)
-                .build());
+                .build(), testUser);
         service.addEntry(Entry.builder()
                 .price(400)
                 .category(Category.ONETIME_INCOME)
-                .build());
+                .build(), testUser);
         List<CategoryCount> testList = new ArrayList<>();
         testList.add(CategoryCount.builder()
                 .category(Category.FOOD)
                 .price(-200L)
                 .build());
         assertEquals(testList,
-                service.getExpenseCountByCategory());
+                service.getExpenseCountOfUserByCategory(testUser));
     }
 
     @Test
     void givenThereAreEntriesInDBWhenTop5AreQueriedThenCategoriesWithBiggestSpendingReturned() {
-        service.addEntry(Entry.builder().price(1000).category(Category.PAYMENT).build());
-        service.addEntry(Entry.builder().price(-7000).category(Category.PETS).build());
-        service.addEntry(Entry.builder().price(-2000).category(Category.FOOD).build());
-        service.addEntry(Entry.builder().price(-700).category(Category.TRANSPORTATION).build());
-        service.addEntry(Entry.builder().price(-600).category(Category.HOUSEHOLD).build());
-        service.addEntry(Entry.builder().price(-200).category(Category.MISCELLANEOUS).build());
+        service.addEntry(Entry.builder().price(1000).category(Category.PAYMENT).build(), testUser);
+        service.addEntry(Entry.builder().price(-7000).category(Category.PETS).build(), testUser);
+        service.addEntry(Entry.builder().price(-2000).category(Category.FOOD).build(), testUser);
+        service.addEntry(Entry.builder().price(-700).category(Category.TRANSPORTATION).build(), testUser);
+        service.addEntry(Entry.builder().price(-600).category(Category.HOUSEHOLD).build(), testUser);
+        service.addEntry(Entry.builder().price(-200).category(Category.MISCELLANEOUS).build(), testUser);
 
         List<CategoryCount> testList = new ArrayList<>(Arrays.asList(
                 new CategoryCount(Category.PETS, -7000L),
@@ -182,6 +187,6 @@ public class EntryServiceTest {
                 new CategoryCount(Category.HOUSEHOLD, -600L),
                 new CategoryCount(Category.MISCELLANEOUS, -200L)));
 
-        assertEquals(testList, service.getTop5Spending());
+        assertEquals(testList, service.getTop5SpendingOfUser(testUser));
     }
 }
