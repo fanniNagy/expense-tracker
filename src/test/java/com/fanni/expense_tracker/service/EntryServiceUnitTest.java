@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class EntryServiceUnitTest {
 
     private EntryService service;
+
     @Mock
     private EntryRepository repository;
 
@@ -122,6 +123,18 @@ public class EntryServiceUnitTest {
         Mockito.verify(this.repository,
                 Mockito.times(1))
                 .findEntriesOfUserByPriceBetween(user.getId(), testPriceFrom, testPriceTo);
+    }
+
+    @Test
+    void givenThereAreNoMatchingEntriesInRepository_WhenEntriesAreQueriedByPriceBetween_ThenEmptyHashSetReturned() {
+        int testPriceFrom = -2000;
+        int testPriceTo = -200;
+        Mockito
+                .when(this.repository.findEntriesOfUserByPriceBetween(Mockito.any(), Mockito.anyInt(), Mockito.anyInt()))
+                .thenReturn(null);
+        assertEquals(HashSet.class,
+                this.service.findEntriesOfUserByPriceBetween(testPriceFrom, testPriceTo, this.user).getClass());
+        assertTrue(this.service.findEntriesOfUserByPriceBetween(testPriceFrom, testPriceTo, this.user).isEmpty());
     }
 
 }
