@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,13 +69,13 @@ public class EntryServiceUnitTest {
     }
 
     @Test
-    void givenRepositoryAvailable_WhenAllEntriesOfUserQueried_ThenRepositoryReturnsNotNull(){
+    void givenRepositoryAvailable_WhenAllEntriesOfUserQueried_ThenRepositoryReturnsNotNull() {
         assertNotNull(this.service.getAllEntries(this.user));
         Mockito.verify(this.repository, Mockito.times(1)).findAllEntryByUserId(this.user.getId());
     }
 
     @Test
-    void givenAnyEntryAndUserObjects_WhenEntryAdded_ExpectRepositoryReturnsNotNull(){
+    void givenAnyEntryAndUserObjects_WhenEntryAdded_ExpectRepositoryReturnsNotNull() {
         Entry entry = Entry.builder()
                 .user(this.user)
                 .price(-200)
@@ -86,7 +87,7 @@ public class EntryServiceUnitTest {
     }
 
     @Test
-    void givenRepositoryAvailable_WhenRepositoryCleared_ThenNoEntryCanBeFound(){
+    void givenRepositoryAvailable_WhenRepositoryCleared_ThenNoEntryCanBeFound() {
         this.service.clearRepository();
         Mockito.verify(this.repository,
                 Mockito.times(1))
@@ -95,7 +96,7 @@ public class EntryServiceUnitTest {
     }
 
     @Test
-    void givenThereAreNoMatchingEntriesInRepository_WhenEntriesAreQueriedByDateBetween_ThenNotNullReturned(){
+    void givenThereAreNoMatchingEntriesInRepository_WhenEntriesAreQueriedByDateBetween_ThenNotNullReturned() {
         LocalDate testDate = LocalDate.now();
         assertNotNull(this.service.findEntriesOfUserByDateBetween(testDate, testDate, this.user));
         Mockito.verify(this.repository,
@@ -103,6 +104,13 @@ public class EntryServiceUnitTest {
                 .findEntriesOfUserByDateIsBetween(user.getId(), testDate, testDate);
     }
 
-
-
+    @Test
+    void givenThereAreNoMatchingEntriesInRepository_WhenEntriesAreQueriedByDateBetween_ThenEmptyHashSetReturned() {
+        LocalDate testDate = LocalDate.now();
+        Mockito
+                .when(this.repository.findEntriesOfUserByDateIsBetween(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(null);
+        assertEquals(HashSet.class, this.service.findEntriesOfUserByDateBetween(testDate, testDate, this.user).getClass());
+        assertTrue(this.service.findEntriesOfUserByDateBetween(testDate, testDate, this.user).isEmpty());
+    }
 }
