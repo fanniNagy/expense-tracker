@@ -1,5 +1,6 @@
 package com.fanni.expense_tracker.service;
 
+import com.fanni.expense_tracker.model.AppUser;
 import com.fanni.expense_tracker.model.Category;
 import com.fanni.expense_tracker.model.CategoryCount;
 import com.fanni.expense_tracker.model.Entry;
@@ -17,12 +18,10 @@ import java.util.stream.Collectors;
 public class EntryService {
 
     private final EntryRepository entryRepository;
-    private final AppUserService userService;
 
     @Autowired
-    public EntryService(EntryRepository entryRepository, AppUserService userService) {
+    public EntryService(EntryRepository entryRepository) {
         this.entryRepository = entryRepository;
-        this.userService = userService;
     }
 
     private LocalDate generateRandomDateBetween(LocalDate from, LocalDate to) {
@@ -63,28 +62,22 @@ public class EntryService {
                 .build();
     }
 
-    public Entry generateRandomExpenseForUser(AppUser user){
-        Entry entry = generateRandomExpense();
-        entry.setUser(user);
-        return entry;
-    }
-
-    public Entry createRandomExpense() {
-        AppUser user = userService.getCurrentUser();
-        Entry randomEntry = generateRandomExpenseForUser(user);
+    public Entry createRandomExpense(AppUser user) {
+        Entry randomEntry = generateRandomExpense();
+        randomEntry.setUser(user);
         entryRepository.saveAndFlush(randomEntry);
         return randomEntry;
     }
 
-    public Set<Entry> getAllEntries() {
-        AppUser currentUser = userService.getCurrentUser();
-        return entryRepository.findAllEntryByUserId(currentUser.getId());
+    public Set<Entry> getAllEntries(AppUser user) {
+        return entryRepository.findAllEntryByUserId(user.getId());
     }
 
-    public Entry addEntry(Entry entry) {
+    public Entry addEntry(Entry entry, AppUser user) {
         Entry toAddEntry = Entry.builder()
+                .user(user)
                 .price(entry.getPrice())
-                .user(userService.getCurrentUser())
+                .user(user)
                 .name(entry.getName() != null ? entry.getName() : entry.getDate().format(DateTimeFormatter.ISO_DATE))
                 .date(entry.getDate())
                 .category(entry.getCategory())
@@ -97,16 +90,15 @@ public class EntryService {
         entryRepository.deleteAll();
     }
 
-    public Set<Entry> findEntriesByDateBetween(LocalDate from, LocalDate to) {
-        Set<Entry> entriesByDateIsBetween = entryRepository.findEntriesByDateIsBetween(from, to);
+    public Set<Entry> findEntriesOfUserByDateBetween(LocalDate from, LocalDate to, AppUser user) {
+        Set<Entry> entriesByDateIsBetween = entryRepository.findEntriesOfUserByDateIsBetween(user.getId(), from, to);
         if (entriesByDateIsBetween == null) {
             entriesByDateIsBetween = new HashSet<>();
         }
         return entriesByDateIsBetween;
     }
 
-    public Set<Entry> findEntriesOfUserByPriceBetween(int priceFrom, int priceTo) {
-        AppUser user = userService.getCurrentUser();
+    public Set<Entry> findEntriesOfUserByPriceBetween(int priceFrom, int priceTo, AppUser user) {
         Set<Entry> entriesByPriceBetween = entryRepository.findEntriesOfUserByPriceBetween(user.getId(), priceFrom, priceTo);
         if (entriesByPriceBetween == null) {
             entriesByPriceBetween = new HashSet<>();
@@ -114,26 +106,26 @@ public class EntryService {
         return entriesByPriceBetween;
     }
 
-    public Entry updateEntryCategory(long id, Category category) {
+    public Entry updateEntryCategoryOfUser(long id, Category category, AppUser user) {
         Entry updatedEntry = entryRepository.findById(id).orElseThrow(() -> {
             throw new NoSuchElementException("No such entry found!");
         });
-        entryRepository.updateCategory(updatedEntry.getId(), category);
+        entryRepository.updateCategory(updatedEntry.getId(), category, user.getId());
         return entryRepository.findById(updatedEntry.getId()).orElseThrow(() -> {
             throw new NoSuchElementException("Categorizing went wrong, no such entry found");
         });
     }
 
-    public List<CategoryCount> countEntriesByCategory() {
-        return entryRepository.getEntriesByCategories();
+    public List<CategoryCount> countEntriesOfUserByCategory(AppUser user) {
+        return entryRepository.getEntriesOfUserByCategories(user.getId());
     }
 
-    public List<CategoryCount> getExpenseCountByCategory() {
-        return entryRepository.getSpendingByCategories();
+    public List<CategoryCount> getExpenseCountOfUserByCategory(AppUser user) {
+        return entryRepository.getSpendingOfUserByCategories(user.getId());
     }
 
-    public List<CategoryCount> getTop5Spending() {
-        return entryRepository.getSpendingByCategories()
+    public List<CategoryCount> getTop5SpendingOfUser(AppUser user) {
+        return entryRepository.getSpendingOfUserByCategories(user.getId())
                 .stream()
                 .limit(5)
                 .collect(Collectors.toList());
