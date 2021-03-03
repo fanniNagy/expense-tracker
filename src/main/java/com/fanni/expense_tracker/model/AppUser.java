@@ -3,6 +3,8 @@ package com.fanni.expense_tracker.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,11 +27,13 @@ public class AppUser implements UserDetails {
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     private Set<SimpleGrantedAuthority> authorities;
 
     @JsonBackReference
     @Singular
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SELECT)
     private Set<Entry> entries;
 
     @Override
