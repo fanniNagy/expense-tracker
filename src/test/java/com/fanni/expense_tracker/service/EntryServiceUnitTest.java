@@ -60,10 +60,11 @@ public class EntryServiceUnitTest {
 
     @Test
     void givenRandomExpenseCreated_WhenMethodCalled_AssertEntryCreatedWithCorrectUser() {
-        Entry randomExpense = this.service.createRandomExpense(user);
+        Entry randomExpense = this.service.createRandomExpense(this.user);
         Mockito.verify(this.repository,
                 Mockito.times(1))
                 .saveAndFlush(Mockito.any(Entry.class));
-        Assertions.assertEquals(user, randomExpense.getUser());
+        Assertions.assertEquals(this.user, randomExpense.getUser());
     }
+
 }
