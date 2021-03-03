@@ -85,4 +85,13 @@ public class EntryServiceUnitTest {
                 .saveAndFlush(Mockito.any(Entry.class));
     }
 
+    @Test
+    void givenRepositoryAvailable_WhenRepositoryCleared_ThenNoEntryCanBeFound(){
+        this.service.clearRepository();
+        Mockito.verify(this.repository,
+                Mockito.times(1))
+                .deleteAll();
+        assertTrue(this.repository.findAll().isEmpty());
+    }
+
 }
