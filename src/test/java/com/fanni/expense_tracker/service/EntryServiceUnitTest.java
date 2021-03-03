@@ -73,4 +73,16 @@ public class EntryServiceUnitTest {
         Mockito.verify(this.repository, Mockito.times(1)).findAllEntryByUserId(this.user.getId());
     }
 
+    @Test
+    void givenAnyEntryAndUserObjects_WhenEntryAdded_ExpectRepositoryReturnsNotNull(){
+        Entry entry = Entry.builder()
+                .user(this.user)
+                .price(-200)
+                .build();
+        assertNotNull(this.service.addEntry(entry, this.user));
+        Mockito.verify(this.repository,
+                Mockito.times(1))
+                .saveAndFlush(Mockito.any(Entry.class));
+    }
+
 }
