@@ -1,6 +1,7 @@
 package com.fanni.expense_tracker.service;
 
 import com.fanni.expense_tracker.model.AppUser;
+import com.fanni.expense_tracker.model.Category;
 import com.fanni.expense_tracker.model.Entry;
 import com.fanni.expense_tracker.repository.EntryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,9 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class EntryServiceUnitTest {
@@ -38,10 +39,20 @@ public class EntryServiceUnitTest {
     }
 
     @Test
-    void givenExpenseGenerated_WhenBuilt_ThenNameNotNull() {
+    void givenAPositiveInteger_WhenRandomCategoryIsGenerated_AssertReturnsIncomeCategory(){
+        assertTrue(Arrays.asList(Category.ONETIME_INCOME, Category.PAYMENT)
+                .contains(this.service.generateRandomCategoryToFitPrice(2)));
+    }
+
+    @Test
+    void givenANegativeInteger_WhenRandomCategoryIsGenerated_AssertReturnsExpenseCategory(){
+        assertFalse(Arrays.asList(Category.ONETIME_INCOME, Category.PAYMENT)
+                .contains(this.service.generateRandomCategoryToFitPrice(-2)));
+    }
+
+    @Test
+    void givenRandomExpenseGenerated_WhenBuilt_ThenNameNotNull() {
         Entry generatedExpense = this.service.generateRandomExpense();
         assertNotNull(generatedExpense.getName());
     }
-
-
 }
