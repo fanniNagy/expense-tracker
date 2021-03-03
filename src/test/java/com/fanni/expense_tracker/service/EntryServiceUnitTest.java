@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -137,4 +139,12 @@ public class EntryServiceUnitTest {
         assertTrue(this.service.findEntriesOfUserByPriceBetween(testPriceFrom, testPriceTo, this.user).isEmpty());
     }
 
+    @Test
+    void givenNoEntryCanBeFound_WhenEntryQueriedForUpdatingCategory_AssertThrowsProperException() {
+        Mockito
+                .when(this.repository.findById(Mockito.any()))
+                .thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class,
+                () -> this.service.updateEntryCategoryOfUser(0L, Category.FOOD, this.user));
+    }
 }
