@@ -94,4 +94,15 @@ public class EntryServiceUnitTest {
         assertTrue(this.repository.findAll().isEmpty());
     }
 
+    @Test
+    void givenThereAreNoMatchingEntriesInRepository_WhenEntriesAreQueriedByDateBetween_ThenNotNullReturned(){
+        LocalDate testDate = LocalDate.now();
+        assertNotNull(this.service.findEntriesOfUserByDateBetween(testDate, testDate, this.user));
+        Mockito.verify(this.repository,
+                Mockito.times(1))
+                .findEntriesOfUserByDateIsBetween(user.getId(), testDate, testDate);
+    }
+
+
+
 }
