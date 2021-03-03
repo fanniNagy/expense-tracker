@@ -33,7 +33,7 @@ public class EntryServiceUnitTest {
     @BeforeEach
     public void initServiceAndUser() {
         this.service = new EntryService(repository);
-        this.user = AppUser.builder().userName("testUser").build();
+        this.user = AppUser.builder().id(0L).userName("testUser").build();
     }
 
     @Test
@@ -146,5 +146,28 @@ public class EntryServiceUnitTest {
                 .thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class,
                 () -> this.service.updateEntryCategoryOfUser(0L, Category.FOOD, this.user));
+    }
+
+    @Test
+    void givenEntryFoundToUpdate_WhenEntryUpdated_ThenReturnsCorrectEntry(){
+        Entry entry = Entry.builder()
+                .id(0L)
+                .user(this.user)
+                .price(-200)
+                .category(Category.UNCATEGORIZED)
+                .build();
+        Category givenCategory = Category.FOOD;
+
+        Mockito
+                .when(this.repository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.of(entry));
+
+        entry.setCategory(givenCategory);
+
+        assertEquals(givenCategory,
+                this.service.updateEntryCategoryOfUser(entry.getId(), givenCategory, this.user).getCategory());
+
+        Mockito.verify(this.repository, Mockito.times(1))
+                .updateCategory(0L, givenCategory, 0L);
     }
 }
