@@ -171,4 +171,29 @@ public class EntryServiceUnitTest {
         Mockito.verify(this.repository, Mockito.times(1))
                 .updateCategory(entry.getId(), givenCategory, entry.getUser().getId());
     }
+
+    @Test
+    void givenEntryFoundAndUpdated_WhenQueriedToReturnButNotFound_AssertThrowsProperException(){
+        Entry entry = Entry.builder()
+                .id(0L)
+                .user(this.user)
+                .price(-200)
+                .category(Category.UNCATEGORIZED)
+                .build();
+        Category givenCategory = Category.FOOD;
+
+        Mockito
+                .when(this.repository.findById(entry.getId()))
+                .thenReturn(Optional.of(entry));
+
+        entry.setCategory(givenCategory);
+
+        Mockito
+                .when(this.repository.findById(entry.getId()))
+                .thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class,
+                () -> this.service.updateEntryCategoryOfUser(entry.getId(), Category.FOOD, this.user),
+                "Categorizing went wrong, no such entry found");
+    }
 }
