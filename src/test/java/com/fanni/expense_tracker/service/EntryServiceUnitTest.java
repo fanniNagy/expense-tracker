@@ -145,7 +145,8 @@ public class EntryServiceUnitTest {
                 .when(this.repository.findById(Mockito.any()))
                 .thenReturn(Optional.empty());
         assertThrows(NoSuchElementException.class,
-                () -> this.service.updateEntryCategoryOfUser(0L, Category.FOOD, this.user));
+                () -> this.service.updateEntryCategoryOfUser(0L, Category.FOOD, this.user),
+                "No such entry found!");
     }
 
     @Test
@@ -168,6 +169,6 @@ public class EntryServiceUnitTest {
                 this.service.updateEntryCategoryOfUser(entry.getId(), givenCategory, this.user).getCategory());
 
         Mockito.verify(this.repository, Mockito.times(1))
-                .updateCategory(0L, givenCategory, 0L);
+                .updateCategory(entry.getId(), givenCategory, entry.getUser().getId());
     }
 }
