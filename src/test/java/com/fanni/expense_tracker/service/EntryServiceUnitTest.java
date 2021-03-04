@@ -150,7 +150,7 @@ public class EntryServiceUnitTest {
     }
 
     @Test
-    void givenEntryFoundToUpdate_WhenEntryUpdated_ThenReturnsCorrectEntry(){
+    void givenEntryFoundToUpdate_WhenEntryUpdated_ThenReturnsCorrectEntry() {
         Entry entry = Entry.builder()
                 .id(0L)
                 .user(this.user)
@@ -173,7 +173,7 @@ public class EntryServiceUnitTest {
     }
 
     @Test
-    void givenEntryFoundAndUpdated_WhenQueriedToReturnButNotFound_AssertThrowsProperException(){
+    void givenEntryFoundAndUpdated_WhenQueriedToReturnButNotFound_AssertThrowsProperException() {
         Entry entry = Entry.builder()
                 .id(0L)
                 .user(this.user)
@@ -206,6 +206,14 @@ public class EntryServiceUnitTest {
         Mockito
                 .verify(this.repository, Mockito.times(1))
                 .getEntriesOfUserByCategories(this.user.getId());
+    }
+
+    @Test
+    void givenThereAreNoEntries_WhenEntriesQueriedToCountByCategories_NoNullReturned() {
+        assertNotNull(this.repository.getSpendingOfUserByCategories(this.user.getId()));
+        Mockito
+                .verify(this.repository, Mockito.times(1))
+                .getSpendingOfUserByCategories(this.user.getId());
     }
 
 }
