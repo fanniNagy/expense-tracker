@@ -182,18 +182,21 @@ public class EntryServiceUnitTest {
                 .build();
         Category givenCategory = Category.FOOD;
 
-        Mockito
-                .when(this.repository.findById(entry.getId()))
-                .thenReturn(Optional.of(entry));
-
         entry.setCategory(givenCategory);
 
         Mockito
-                .when(this.repository.findById(entry.getId()))
-                .thenReturn(Optional.empty());
+                .doReturn(Optional.of(entry))
+                .doReturn(Optional.empty())
+                .when(this.repository).findById(entry.getId());
 
         assertThrows(NoSuchElementException.class,
                 () -> this.service.updateEntryCategoryOfUser(entry.getId(), Category.FOOD, this.user),
                 "Categorizing went wrong, no such entry found");
+
+        Throwable exceptionThatWasThrown = assertThrows(NoSuchElementException.class, () -> {
+            this.service.updateEntryCategoryOfUser(entry.getId(), Category.FOOD, this.user);
+        });
+
+        assertEquals("Categorizing went wrong, no such entry found", exceptionThatWasThrown.getMessage());
     }
 }
