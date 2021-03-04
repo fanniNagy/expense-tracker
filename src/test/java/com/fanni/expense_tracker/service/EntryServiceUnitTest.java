@@ -199,4 +199,13 @@ public class EntryServiceUnitTest {
 
         assertEquals("Categorizing went wrong, no such entry found", exceptionThatWasThrown.getMessage());
     }
+
+    @Test
+    void givenThereAreNoEntries_WhenEntriesQueriedByCategory_NoNullReturned() {
+        assertNotNull(this.repository.getEntriesOfUserByCategories(this.user.getId()));
+        Mockito
+                .verify(this.repository, Mockito.times(1))
+                .getEntriesOfUserByCategories(this.user.getId());
+    }
+
 }
