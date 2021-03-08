@@ -29,4 +29,9 @@ public class UserController {
         return userService.getUserByUserName(username);
     }
 
+    @GetMapping()
+    public AppUser getCurrentUser(){
+        return userService.getCurrentUser();
+    }
+
 }
