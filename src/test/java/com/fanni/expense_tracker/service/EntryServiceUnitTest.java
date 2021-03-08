@@ -215,4 +215,9 @@ public class EntryServiceUnitTest {
                 .getSpendingOfUserByCategories(this.user.getId());
     }
 
+    @Test
+    void givenThereAreNoEntries_WhenEntriesQueriedByTop5SpendingOfUser_NoNullReturned(){
+        assertNotNull(this.service.getTop5SpendingOfUser(this.user));
+    }
+
 }
