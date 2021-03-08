@@ -26,4 +26,11 @@ public class AppUserService {
             throw new NoSuchElementException(String.format("%s username not found!", username));
         });
     }
+
+    public AppUser getUserByUserName(String username){
+        return userRepository.findAppUserByUserName(username).orElseThrow(() -> {
+            throw new NoSuchElementException(String.format("%s username not found!", username));
+        });
+    }
+
 }
