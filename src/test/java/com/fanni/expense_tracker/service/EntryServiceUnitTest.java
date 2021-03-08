@@ -202,7 +202,6 @@ public class EntryServiceUnitTest {
 
     @Test
     void givenThereAreNoEntries_WhenEntriesQueriedByCategory_NoNullReturned() {
-        assertNotNull(this.repository.getEntriesOfUserByCategories(this.user.getId()));
         Mockito
                 .verify(this.repository, Mockito.times(1))
                 .getEntriesOfUserByCategories(this.user.getId());
@@ -210,7 +209,7 @@ public class EntryServiceUnitTest {
 
     @Test
     void givenThereAreNoEntries_WhenEntriesQueriedToCountByCategories_NoNullReturned() {
-        assertNotNull(this.repository.getSpendingOfUserByCategories(this.user.getId()));
+        assertNotNull(this.service.getExpenseCountOfUserByCategory(this.user));
         Mockito
                 .verify(this.repository, Mockito.times(1))
                 .getSpendingOfUserByCategories(this.user.getId());
