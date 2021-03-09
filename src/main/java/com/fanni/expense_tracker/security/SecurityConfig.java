@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.SecretKey;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -42,12 +43,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedOriginPattern("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setExposedHeaders(Arrays.asList(
+                "Access-Control-Allow-Headers", "Authorization, x-xsrf-token, " +
+                        "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, " +
+                        "Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"));
 
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
@@ -63,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
-                .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig),JwtUsernameAndPasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/user/register").permitAll()
                 .antMatchers("/login").permitAll()
