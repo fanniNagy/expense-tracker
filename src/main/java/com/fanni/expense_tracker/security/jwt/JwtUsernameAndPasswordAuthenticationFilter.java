@@ -2,6 +2,7 @@ package com.fanni.expense_tracker.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
+import org.apache.catalina.startup.CredentialHandlerRuleSet;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,9 +13,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
@@ -65,6 +69,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 secretKey);
 
         response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
+        Cookie cookie = new Cookie(jwtConfig.getAuthorizationHeader(), URLEncoder.encode(jwtConfig.getTokenPrefix() + token, StandardCharsets.UTF_16));
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 
     public String tokenBuilder(String userName,
