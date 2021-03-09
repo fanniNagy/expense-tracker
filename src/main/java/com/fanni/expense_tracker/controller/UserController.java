@@ -6,6 +6,7 @@ import com.fanni.expense_tracker.service.UserRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/user")
 public class UserController {
